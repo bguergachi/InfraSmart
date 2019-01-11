@@ -1,0 +1,356 @@
+eqfeed_callback({
+
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.40361049,43.65204426 ]
+    },
+    "properties": {
+    "ID":1,
+    "Location":"124 Jarvis St, Toronto, ON M5B 2B5, Canada",
+    "Date":"2018-07-15",
+    "Time":"22:04:25",
+    "Garbage":77
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36744499,43.64582615 ]
+    },
+    "properties": {
+    "ID":2,
+    "Location":"215 Lake Shore Blvd E, Toronto, ON M5A 3W9, Canada",
+    "Date":"2018-03-27",
+    "Time":"14:28:58",
+    "Garbage":59
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38909398,43.67188004 ]
+    },
+    "properties": {
+    "ID":3,
+    "Location":"Mist Garden, 34-48 Yorkville Ave, Toronto, ON M4W 1L4, Canada",
+    "Date":"2018-07-19",
+    "Time":"07:26:25",
+    "Garbage":82
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.39342123,43.65591903 ]
+    },
+    "properties": {
+    "ID":4,
+    "Location":"35 Baldwin St, Toronto, ON M5T 1L1, Canada",
+    "Date":"2018-07-02",
+    "Time":"07:58:41",
+    "Garbage":29
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36808013,43.67084828 ]
+    },
+    "properties": {
+    "ID":5,
+    "Location":"635 Parliament St, Toronto, ON M4X 1R1, Canada",
+    "Date":"2018-01-02",
+    "Time":"21:50:28",
+    "Garbage":51
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38603076,43.67209961 ]
+    },
+    "properties": {
+    "ID":6,
+    "Location":"820 Church St, Toronto, ON M4W 2M4, Canada",
+    "Date":"2018-10-20",
+    "Time":"11:25:41",
+    "Garbage":63
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.37084870,43.66110569 ]
+    },
+    "properties": {
+    "ID":7,
+    "Location":"219 Gerrard St E, Toronto, ON M5A 2E9, Canada",
+    "Date":"2018-10-31",
+    "Time":"01:27:10",
+    "Garbage":2
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38645152,43.65184241 ]
+    },
+    "properties": {
+    "ID":8,
+    "Location":"360 University Ave, Toronto, ON M5H, Canada",
+    "Date":"2018-01-09",
+    "Time":"23:59:57",
+    "Garbage":53
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36521410,43.64631791 ]
+    },
+    "properties": {
+    "ID":9,
+    "Location":"University Ave At Queen St West North Side, Toronto, ON M5H 2N6, Canada",
+    "Date":"2018-10-07",
+    "Time":"08:00:21",
+    "Garbage":58
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36730519,43.65659184 ]
+    },
+    "properties": {
+    "ID":10,
+    "Location":"26 Bonnycastle St, Toronto, ON M5A 3Y4, Canada",
+    "Date":"2018-10-14",
+    "Time":"02:14:08",
+    "Garbage":71
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.35971287,43.65618971 ]
+    },
+    "properties": {
+    "ID":11,
+    "Location":"240 A Shuter St, Toronto, ON M5A 1W1, Canada",
+    "Date":"2018-11-25",
+    "Time":"22:40:47",
+    "Garbage":85
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.40205560,43.65732711 ]
+    },
+    "properties": {
+    "ID":12,
+    "Location":"44 Bright St, Toronto, ON M5A 3H4, Canada",
+    "Date":"2018-07-16",
+    "Time":"11:18:38",
+    "Garbage":26
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.37631282,43.64946103 ]
+    },
+    "properties": {
+    "ID":13,
+    "Location":"323 College St, Toronto, ON M5T 1S2, Canada",
+    "Date":"2018-09-04",
+    "Time":"21:12:35",
+    "Garbage":77
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.39570868,43.65111710 ]
+    },
+    "properties": {
+    "ID":14,
+    "Location":"37 King St E, Toronto, ON M5C, Canada",
+    "Date":"2018-10-10",
+    "Time":"02:21:08",
+    "Garbage":68
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.37656517,43.65171530 ]
+    },
+    "properties": {
+    "ID":15,
+    "Location":"61 Sullivan St, Toronto, ON M5T 1C2, Canada",
+    "Date":"2018-05-07",
+    "Time":"14:53:46",
+    "Garbage":50
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.39214789,43.66655117 ]
+    },
+    "properties": {
+    "ID":16,
+    "Location":"26 Lombard St, Toronto, ON M5C 1M1, Canada",
+    "Date":"2018-12-07",
+    "Time":"03:27:44",
+    "Garbage":96
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36369163,43.66062101 ]
+    },
+    "properties": {
+    "ID":17,
+    "Location":"Northrop Frye Hall, Toronto, ON M5S 1K6, Canada",
+    "Date":"2018-12-14",
+    "Time":"16:05:57",
+    "Garbage":64
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.37068807,43.66778430 ]
+    },
+    "properties": {
+    "ID":18,
+    "Location":"63 Cole St, Toronto, ON M5A 4M7, Canada",
+    "Date":"2018-12-18",
+    "Time":"22:18:52",
+    "Garbage":20
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38398423,43.64541672 ]
+    },
+    "properties": {
+    "ID":19,
+    "Location":"265 Wellesley St E, Toronto, ON M4X 1G9, Canada",
+    "Date":"2018-09-24",
+    "Time":"06:57:23",
+    "Garbage":73
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.36714872,43.64453085 ]
+    },
+    "properties": {
+    "ID":20,
+    "Location":"144 Front St W, Toronto, ON M5J 2L7, Canada",
+    "Date":"2018-03-11",
+    "Time":"10:19:45",
+    "Garbage":59
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.39194799,43.66867202 ]
+    },
+    "properties": {
+    "ID":21,
+    "Location":"10 Dockside Dr, Toronto, ON M5A 1B6, Canada",
+    "Date":"2018-12-16",
+    "Time":"11:36:28",
+    "Garbage":12
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38881104,43.65700654 ]
+    },
+    "properties": {
+    "ID":22,
+    "Location":"10 Sultan St, Toronto, ON M5S 1S4, Canada",
+    "Date":"2018-04-30",
+    "Time":"09:43:17",
+    "Garbage":90
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.39716314,43.66124173 ]
+    },
+    "properties": {
+    "ID":23,
+    "Location":"533-545 University Ave, Toronto, ON M5G 1X8, Canada",
+    "Date":"2018-08-25",
+    "Time":"12:04:29",
+    "Garbage":95
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.38698482,43.65477158 ]
+    },
+    "properties": {
+    "ID":24,
+    "Location":"Knox College, Toronto, ON M5S, Canada",
+    "Date":"2018-12-21",
+    "Time":"17:25:53",
+    "Garbage":45
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.37356266,43.65398313 ]
+    },
+    "properties": {
+    "ID":25,
+    "Location":"56 Centre Ave, Toronto, ON M5G 1R5, Canada",
+    "Date":"2018-07-09",
+    "Time":"15:04:38",
+    "Garbage":76
+    }
+  }
+]
+});
