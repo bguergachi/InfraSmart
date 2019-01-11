@@ -13,25 +13,22 @@
 get_header(); ?> <!––gives the side bar––>
 
     <style type="text/css">
-
     #map {
-        
         width:    100%;
         height:   750px;
-        
     }
     </style>
 
     <div id="map"></div>
 
     <script>
-	
+
         function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
           center: new google.maps.LatLng(43.65, -79.403),
           zoom: 13
         });
-        
+
           // Change this depending on the name of your PHP or XML file
           downloadUrl('http://localhost/DumpsterSite/wp-content/themes/twentyfifteen/SQLtable-script.php', function(data) {
             var xml = data.responseXML;
@@ -46,7 +43,7 @@ get_header(); ?> <!––gives the side bar––>
                   parseFloat(markerElem.getAttribute('lng')));
 			  var availability = markerElem.getAttribute('availability');
               var infowincontent = document.createElement('div');
-			  
+
 			  //Info window content
               var strong = document.createElement('strong');
               strong.textContent = name
@@ -56,22 +53,22 @@ get_header(); ?> <!––gives the side bar––>
 			  /*var text2 = document.createElement('text2');
 			  text2.textContent = "ID:";
 			  infowincontent.appendChild(text2);
-			  
+
 			  var text_id = document.createElement('text');
               text_id.textContent = id;
 			  infowincontent.appendChild(text_id);
-			  
+
 			  var text2 = document.createElement('text2');
 			  text2.textContent = " Address: ";
 			  infowincontent.appendChild(text2);
-			  
+
 			  var text3 = document.createElement('text3');
 			   text3.textContent = address;
 			   infowincontent.appendChild(text3); */
-			 
+
 			 var testtext = "ID: "
-			var contentString = 
-		
+			var contentString =
+
 			'<div id="content">'+
 			  '<div id="siteNotice">'+
 			  '</div>'+
@@ -80,25 +77,24 @@ get_header(); ?> <!––gives the side bar––>
 			+'<b>Availability: </b>' + availability +
 			'</div>'+
 			'</div>';
-			
-						
+
               //var icon = customLabel[date] || {}; //icon is declared by default
 			  var image1 = 'http://maps.google.com/mapfiles/kml/paddle/grn-blank.png';
 			   var image2 = 'http://maps.google.com/mapfiles/kml/paddle/ylw-blank.png';
 			   var image3 = 'http://maps.google.com/mapfiles/kml/paddle/red-blank.png';
-			   
+
 			  if (availability < 30){
 				  image = image1;
 			  }else if((availability >=30) && (availability <=60)){
 				  image = image2;
 			  }else {
 				  image = image3;
-			  }  
-			   
+			  }
+
               var marker = new google.maps.Marker({
                 map: map,
                 position: point,
-                
+
 				icon: image
 			  });
 			  //content box
@@ -107,7 +103,7 @@ get_header(); ?> <!––gives the side bar––>
 					content: contentString,
 					 maxWidth: 150
 				});
-		
+
               marker.addListener('click', function() {
                 //infoWindow.setContent(infowincontent);
                 infoWindow.open(map, marker);
@@ -115,8 +111,6 @@ get_header(); ?> <!––gives the side bar––>
             });
           });
         }
-
-
 
       function downloadUrl(url, callback) {
         var request = window.ActiveXObject ?
@@ -139,8 +133,7 @@ get_header(); ?> <!––gives the side bar––>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-y5nufBunnq4ne8E8TMLyCpTkrKVxvvI&callback=initMap">
     </script>
-	
-	
+
 		<?php
 		// Start the loop.
 		while ( have_posts() ) : the_post();
@@ -156,5 +149,5 @@ get_header(); ?> <!––gives the side bar––>
 		// End the loop.
 		endwhile;
 		?>
-		
+
     <?php get_footer(); ?>

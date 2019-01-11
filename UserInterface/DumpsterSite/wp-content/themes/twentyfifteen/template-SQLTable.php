@@ -13,14 +13,9 @@
 get_header();
 ?> <!––gives the side bar––>
 
-
-
-
     <style type="text/css">
-
-
     </style>
-	
+
 <?php
 $servername = "localhost";
 $username = "root";
@@ -33,22 +28,20 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 	echo "failed";
-} 
+}
 
 $sql = "SELECT id, date, time, address, lat, lng, availability FROM markers ORDER BY id ASC";
 $result = $conn->query($sql);
+?>
 
-
-?> 
-
-<?php    
+<?php
 // Start the loop.
 while (have_posts()):
     the_post();
-    
+
     // Include the page content template.
     get_template_part('content', 'page');
-	
+
 	//output the table
     if ($result->num_rows > 0) {
     echo "<table><tr><th>ID</th><th>Date</th><th>Time</th><th>Address</th><th>Latitude</th><th>Longitude</th><th>Availability</th></tr>";
