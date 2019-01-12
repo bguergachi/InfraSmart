@@ -131,7 +131,7 @@ get_header(); ?> <!––gives the side bar––>
       function doNothing() {}
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-y5nufBunnq4ne8E8TMLyCpTkrKVxvvI&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap">
     </script>
 
 		<?php
