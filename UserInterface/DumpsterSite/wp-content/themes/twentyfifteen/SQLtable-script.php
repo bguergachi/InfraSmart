@@ -44,6 +44,7 @@ while ($row = @mysqli_fetch_assoc($result)){
   // Add to XML document node
   echo '<marker ';
   echo 'id="' . $row['id'] . '" ';
+  echo 'priority="' . $row['priority'] . '" ';
   //if(isset($_POST['date'])){ $name = $_POST['date']; }
   echo 'date="' . parseToXML($row['date']) . '" ';
   echo 'time="' . parseToXML($row['time']) . '" ';

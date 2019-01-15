@@ -95,7 +95,8 @@ jQuery( document ).ready(function( $ ) {
 	function testDefaultTheme() {
 		var $parent = $( '.individual-loopback-test-status', '#test-single-no-theme' ),
 			data = {
-				action: 'health-check-loopback-default-theme'
+				'action': 'health-check-loopback-default-theme',
+				'_wpnonce': HealthCheck.nonce.loopback_default_theme
 			};
 
 		$.post(
@@ -125,8 +126,9 @@ jQuery( document ).ready(function( $ ) {
 
 		$testLine = $testLines.first();
 		data = {
-			action: 'health-check-loopback-individual-plugins',
-			plugin: $testLine.data( 'test-plugin' )
+			'action': 'health-check-loopback-individual-plugins',
+			'plugin': $testLine.data( 'test-plugin' ),
+			'_wpnonce': HealthCheck.nonce.loopback_individual_plugins
 		};
 
 		$parentField = $( '.individual-loopback-test-status', $testLine );
@@ -153,7 +155,8 @@ jQuery( document ).ready(function( $ ) {
 		var $trigger = $( this ),
 			$parent = $( this ).closest( 'td' ),
 			data = {
-				action: 'health-check-loopback-no-plugins'
+				'action': 'health-check-loopback-no-plugins',
+				'_wpnonce': HealthCheck.nonce.loopback_no_plugins
 			};
 
 		e.preventDefault();
@@ -180,14 +183,15 @@ jQuery( document ).ready(function( $ ) {
 	});
 });
 
-/* global ajaxurl */
+/* global ajaxurl, HealthCheck */
 jQuery( document ).ready(function( $ ) {
 	$( '.health-check-site-status-test' ).each( function() {
 		var $check = $( this ),
-			data = {
-				action: 'health-check-site-status',
-				feature: $( this ).data( 'site-status' )
-			};
+            data = {
+                'action': 'health-check-site-status',
+                'feature': $( this ).data( 'site-status' ),
+                '_wpnonce': HealthCheck.nonce.site_status
+            };
 
 		$.post(
 			ajaxurl,
@@ -199,11 +203,12 @@ jQuery( document ).ready(function( $ ) {
 	});
 });
 
-/* global ajaxurl */
+/* global ajaxurl, HealthCheck */
 jQuery( document ).ready(function( $ ) {
 	$( '#health-check-file-integrity' ).submit( function( e ) {
 		var data = {
-			'action': 'health-check-files-integrity-check'
+			'action': 'health-check-files-integrity-check',
+			'_wpnonce': HealthCheck.nonce.files_integrity_check
 		};
 
 		e.preventDefault();
@@ -233,7 +238,8 @@ jQuery( document ).ready(function( $ ) {
 
 		data = {
 			'action': 'health-check-view-file-diff',
-			'file': file
+			'file': file,
+			'_wpnonce': HealthCheck.nonce.view_file_diff
 		};
 
 		$.post(
@@ -265,7 +271,7 @@ jQuery( document ).ready(function( $ ) {
 	});
 });
 
-/* global ajaxurl */
+/* global ajaxurl, HealthCheck */
 jQuery( document ).ready(function( $ ) {
 	$( '#health-check-mail-check' ).submit( function( e ) {
 		var email = $( '#health-check-mail-check #email' ).val(),
@@ -280,7 +286,8 @@ jQuery( document ).ready(function( $ ) {
 		data = {
 			'action': 'health-check-mail-check',
 			'email': email,
-			'email_message': emailMessage
+			'email_message': emailMessage,
+			'_wpnonce': HealthCheck.nonce.mail_check
 		};
 
 		$.post(

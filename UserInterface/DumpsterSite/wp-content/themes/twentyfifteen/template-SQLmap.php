@@ -28,13 +28,14 @@ get_header(); ?> <!––gives the side bar––>
           center: new google.maps.LatLng(43.65, -79.403),
           zoom: 13
         });
-
+//test
           // Change this depending on the name of your PHP or XML file
           downloadUrl('http://localhost/DumpsterSite/wp-content/themes/twentyfifteen/SQLtable-script.php', function(data) {
             var xml = data.responseXML;
             var markers = xml.documentElement.getElementsByTagName('marker');
             Array.prototype.forEach.call(markers, function(markerElem) { //this is techinically the loop
               var id = markerElem.getAttribute('id');
+              var priority = markerElem.getAttribute('priority');
               var date = markerElem.getAttribute('date');
 			  var time = markerElem.getAttribute('time');
               var address = markerElem.getAttribute('address');
@@ -66,7 +67,7 @@ get_header(); ?> <!––gives the side bar––>
 			   text3.textContent = address;
 			   infowincontent.appendChild(text3); */
 
-			 var testtext = "ID: "
+			var testtext = "ID: "
 			var contentString =
 
 			'<div id="content">'+
@@ -131,7 +132,8 @@ get_header(); ?> <!––gives the side bar––>
       function doNothing() {}
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfsoh48H-SKFU3dv2EcmQihtex9uO_JdA
+    &callback=initMap">
     </script>
 
 		<?php
