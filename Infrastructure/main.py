@@ -1,24 +1,28 @@
 from Scheduling import predictor
-import Scheduling.Data.dataGen as data
-
-
+from Data import dataGen as data
 
 def CreatePredictor(path):
     return predictor.Predictor(path)
 
+
 def CreateRouter(path):
-    #TODO: Impelement router algorithm
+    # TODO: Impelement router algorithm
     pass
 
-if __name__ == '__main__':
-    #Create random data
-    data.generateRandomData(24,"Scheduling/Data/")
-    #Build model and train
-    predictor = CreatePredictor('Scheduling/Data/')
-    #Test predictor
-    print(predictor.predict([240,2700,70,5]))
-    #Update predictor
-    predictor.updateAndTrain([240,2700,70,5,'f'])
-    #Check prediction again
-    print(predictor.predict([240, 2700, 70, 5]))
 
+if __name__ == '__main__':
+    # Create random data
+    data.generateRandomTrainingData(48, "Scheduling/Data/")
+    # Build model and train
+    predictor = CreatePredictor('Scheduling/Data/')
+    # Test predictor
+    a = predictor.predict([1234, 34523.56, 64.23, 2])
+    # Update predictor
+    predictor.updateAndTrain([1234, 34523.56, 64.23, 2, 'f'])
+    # Check prediction again
+    b = predictor.predict([1234, 34523.56, 64.23, 2])
+
+    print("Test:")
+    print(a)
+    print("After update:")
+    print(b)

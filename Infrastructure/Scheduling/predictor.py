@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os, sys
 
-#Set verbosity of tensorflow
+# Set verbosity of tensorflow
 
 
 inputNodes = 4
@@ -31,23 +31,19 @@ class Predictor:
         print(df)
         print("\n\n")
 
-
-
         self._encode_text_index(df, "Priority")
-        self._x, self._y = self._to_xy(df, "Priority")
+        self._x, self._y = df.as_matrix(["Location", "Time", "Accessibility", "Day"]), np.stack(
+            df["Priority"].values, axis=0)
 
         print(self._x)
         print(self._y)
 
-
-
         self._buildModel()
         self.train()
 
-
     def _buildModel(self):
         '''
-        Build Model
+        Build neural network Model
         :return: null
         '''
 
@@ -61,7 +57,6 @@ class Predictor:
         self._model.add(keras.layers.Dense(self._y.shape[1], activation=tf.nn.softmax))
 
         self._model.summary()
-
 
     def train(self):
         '''
@@ -90,7 +85,7 @@ class Predictor:
         print("\nPredictor matrix")
         predict = self._model.predict(x_in)
 
-        #Set variable if not yet set
+        # Set variable if not yet set
         try:
             self._weeklyMatrix = np.vstack((self._weeklyMatrix, predict))
         except:
@@ -105,9 +100,8 @@ class Predictor:
         Get probabilities of what day will be best to pick up on
         :return: vector with column averages of weekly matrix
         '''
-        self._weeklyProbability = np.mean(self._weeklyMatrix,axis=1)
+        self._weeklyProbability = np.mean(self._weeklyMatrix, axis=1)
         return self._weeklyProbability
-
 
     # Update data and train model again
     def updateAndTrain(self, data):
@@ -116,15 +110,16 @@ class Predictor:
         :param data: data point to append to csv file, should be an array of length inputNodes
         :return:
         '''
-        file = open(self._dataFolderPath+'training.csv','a')
-        stringToAppend = "\n"
-        for i in range(len(data)-1):
-            stringToAppend += str(data[i])+","
-        stringToAppend += str(data[i+1])
+        file = open(self._dataFolderPath + 'training.csv', 'a')
+        stringToAppend = ""
+        for i in range(len(data) - 1):
+            stringToAppend += str(data[i]) + ","
+        stringToAppend += str(data[i + 1]) + "\n"
         print("Updating .csv file with new data point\n")
         file.write(stringToAppend)
         file.close()
         self.train()
+
     #
     def _to_xy(self, df, target):
         '''
@@ -159,9 +154,11 @@ class Predictor:
         :param name: column to encode
         :return:
         '''
-        le = preprocessing.LabelEncoder()
-        df[name] = le.fit_transform(df[name])
-        return le.classes_
+        conversionDic = {'m': np.asarray([1, 0, 0, 0, 0]), 'tu': np.asarray([0, 1, 0, 0, 0]),
+                         'w': np.asarray([0, 0, 1, 0, 0]), 'th': np.asarray([0, 0, 0, 1, 0]),
+                         'f': np.asarray([0, 0, 0, 0, 1])}
+        df[name] = df[name].map(conversionDic)
+        print(df)
 
     def getWeeklyMatrix(self):
         '''
