@@ -1,20 +1,21 @@
-from Scheduling import predictor
-from Data import dataGen as data
+import predictor
+import router
+import dataGen as data
+import pandas as pd
 
-def CreatePredictor(path):
-    return predictor.Predictor(path)
+def CreatePredictor(dataFrame):
+    return predictor.Predictor(dataFrame)
 
 
-def CreateRouter(path):
-    # TODO: Impelement router algorithm
-    pass
+def CreateRouter(dataFrame):
+    return router.Router(dataFrame)
 
 
 if __name__ == '__main__':
     # Create random data
-    data.generateRandomTrainingData(48, "Scheduling/Data/")
+    data.generateRandomTrainingData(48, "Data/")
     # Build model and train
-    predictor = CreatePredictor('Scheduling/Data/')
+    predictor = CreatePredictor(pd.read_csv("Data/training.csv", na_values=['NA', '?']))
     # Test predictor
     a = predictor.predict([1234, 34523.56, 64.23, 2])
     # Update predictor

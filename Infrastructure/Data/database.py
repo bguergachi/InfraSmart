@@ -12,7 +12,7 @@ class SQLServer:
         except Error as e:
             print("Error while connecting to MySQL", e)
 
-    def queryToSQL(self,query):
+    def customQueryToSQL(self,query):
         cursor = self._mySQLconnection.cursor()
         cursor.execute(query)
         try:
@@ -26,10 +26,21 @@ class SQLServer:
             cursor.execute("select * from "+table)
         else:
             cursor.execute(query)
+
+        df = pd.DataFrame(cursor.fetchall())
+        cursor.execute("SHOW columns FROM " + table)
+        columns = [column[0] for column in cursor.fetchall()]
+        df.columns = columns
+        df.set_index('id', inplace=True, drop=True)
         try:
-            return pd.DataFrame(cursor.fetchall())
+            return df
         except:
-            return None
+            raise TypeError("Custom query given doesn't return a proper table to convert to a dataFrame")
+
+    def setDayToPickup(self,day='na'):
+        self._day = day
+        cursor = self._mySQLconnection.cursor()
+        cursor.execute("update day set day="+day+" where id=1")
 
     def close(self):
         # closing database connection.
@@ -39,5 +50,7 @@ class SQLServer:
 
 if __name__ == '__main__':
     sql = SQLServer('dumpstersite')
-    print(sql.queryToSQL('select availability from markers'))
-    print(sql.queryToSQL('alter table markers add distance decimal'))
+    #print(sql.customQueryToSQL('select accessibility from markers'))
+    #print(sql.customQueryToSQL('alter table markers add distance decimal'))
+    print(sql.getPandasTable("markers"))
+    sql.close()

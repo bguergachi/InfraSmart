@@ -16,7 +16,7 @@ inputNodes = 4
 
 
 class Predictor:
-    def __init__(self, dataFolderPath):
+    def __init__(self, dataFrame):
         '''
         Create a neural network predictor to schedule day of the week
         :param dataFolderPath: path to data folder with .csv file, .db file and .hdf5 file
@@ -25,11 +25,14 @@ class Predictor:
         print(tf.__version__)
         sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
         tf.logging.set_verbosity(tf.logging.ERROR)
-        df = pd.read_csv(self._dataFolderPath + "training.csv", na_values=['NA', '?'])
+
+        df = dataFrame
 
         print("DataFrame:\n\n")
         print(df)
         print("\n\n")
+
+
 
         self._encode_text_index(df, "Priority")
         self._x, self._y = df.as_matrix(["Location", "Time", "Accessibility", "Day"]), np.stack(

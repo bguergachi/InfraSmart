@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Infrastructure/Scheduling" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Infrastructure" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Infrastructure/Scheduling/Data" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Infrastructure/Data" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Infrastructure/Mapping" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
