@@ -16,7 +16,7 @@ inputNodes = 4
 
 
 class Predictor:
-    def __init__(self, dataFrame):
+    def __init__(self, dataFrame,dataFolderPath=None):
         '''
         Create a neural network predictor to schedule day of the week
         :param dataFolderPath: path to data folder with .csv file, .db file and .hdf5 file
@@ -26,13 +26,17 @@ class Predictor:
         sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
         tf.logging.set_verbosity(tf.logging.ERROR)
 
-        df = dataFrame
+        try:
+            df = pd.read_csv(dataFolderPath, na_values=['NA', '?'])
+        except:
+            df = dataFrame
 
         print("DataFrame:\n\n")
         print(df)
         print("\n\n")
 
-
+        #Convert index to day string
+        self._days = ['m', 'tu', 'w', 'th', 'f']
 
         self._encode_text_index(df, "Priority")
         self._x, self._y = df.as_matrix(["Location", "Time", "Accessibility", "Day"]), np.stack(
@@ -68,10 +72,10 @@ class Predictor:
         '''
         print("Training model...")
         self._model.compile(optimizer=tf.train.AdamOptimizer(), loss='categorical_crossentropy', metrics=['accuracy'])
-        monitor = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-3, patience=5, verbose=0, mode='auto')
-        checkpointer = keras.callbacks.ModelCheckpoint(filepath=self._dataFolderPath + "optimized_weights.hdf5",
-                                                       verbose=0, save_best_only=True)  # save best model
-        self._model.fit(self._x, self._y, callbacks=[monitor, checkpointer], verbose=2, epochs=100)
+        #monitor = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-3, patience=5, verbose=0, mode='auto')
+        #checkpointer = keras.callbacks.ModelCheckpoint(filepath=self._dataFolderPath + "optimized_weights.hdf5",
+        #                                               verbose=0, save_best_only=True)  # save best model
+        self._model.fit(self._x, self._y, verbose=2, epochs=100)
         # Use when data is large enough
         # self._model.load_weights(self._dataFolderPath+"optimized_weights.hdf5") # load weights from best model
 
@@ -103,8 +107,21 @@ class Predictor:
         Get probabilities of what day will be best to pick up on
         :return: vector with column averages of weekly matrix
         '''
-        self._weeklyProbability = np.mean(self._weeklyMatrix, axis=1)
+        self._weeklyProbability = np.mean(self._weeklyMatrix, axis=0)
         return self._weeklyProbability
+
+    def scheduleDay(self,threshold=None):
+        '''
+        Get day to schedule based on highest probability or probability threshold user passes
+        :return: string of day to schedule
+        '''
+        if threshold == None:
+            list = np.argmax(self.scheduleDayVector()).tolist()
+            try:
+                return self._days[list[0]]
+            except:
+                return self._days[list]
+        return self.scheduleDayVector()[np.where(self.scheduleDayVector() > threshold)]
 
     # Update data and train model again
     def updateAndTrain(self, data):

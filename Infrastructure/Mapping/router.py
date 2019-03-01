@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 import random
 
-gmaps = googlemaps.Client(key="AIzaSyCBt7IfLLpZ9s5zzi5Zla3AVK_dfxLkT74")
+gmaps = googlemaps.Client(key="AIzaSyB9KEVekAHK9YNSO0rLzwlc_M6pDN-BNEM")
 
 class Router:
-    def __init__(self, dataFrame):
+    def __init__(self, dataFrame, file = False):
 
         self._accessibility = dataFrame['accessibility'].values.tolist()
 
@@ -17,43 +17,44 @@ class Router:
         waypoint_distances = {}
         waypoint_durations = {}
 
-        for (waypoint1, waypoint2) in combinations(self._all_waypoints, 2):
-            try:
-                route = gmaps.distance_matrix(origins=[waypoint1],
-                                              destinations=[waypoint2],
-                                              mode="driving",  # Change this to "walking" for walking directions,
-                                              # "bicycling" for biking directions, etc.
-                                              language="English",
-                                              units="metric")
+        if file:
+            for (waypoint1, waypoint2) in combinations(self._all_waypoints, 2):
+                try:
+                    route = gmaps.distance_matrix(origins=[waypoint1],
+                                                  destinations=[waypoint2],
+                                                  mode="driving",  # Change this to "walking" for walking directions,
+                                                  # "bicycling" for biking directions, etc.
+                                                  language="English",
+                                                  units="metric")
 
-                # "distance" is in meters
-                distance = route["rows"][0]["elements"][0]["distance"]["value"]
+                    # "distance" is in meters
+                    distance = route["rows"][0]["elements"][0]["distance"]["value"]
 
-                # "duration" is in seconds
-                duration = route["rows"][0]["elements"][0]["duration"]["value"]
+                    # "duration" is in seconds
+                    duration = route["rows"][0]["elements"][0]["duration"]["value"]
 
-                waypoint_distances[frozenset([waypoint1, waypoint2])] = distance
-                waypoint_durations[frozenset([waypoint1, waypoint2])] = duration
+                    waypoint_distances[frozenset([waypoint1, waypoint2])] = distance
+                    waypoint_durations[frozenset([waypoint1, waypoint2])] = duration
 
-            except Exception as e:
-                print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
+                except Exception as e:
+                    print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
 
-        with open("my-waypoints-dist-dur.tsv", "w") as out_file:
-            out_file.write("\t".join(["waypoint1",
-                                      "waypoint2",
-                                      "distance_m",
-                                      "duration_s"]))
+            with open("my-waypoints-dist-dur.tsv", "w") as out_file:
+                out_file.write("\t".join(["waypoint1",
+                                          "waypoint2",
+                                          "distance_m",
+                                          "duration_s"]))
 
-            for (waypoint1, waypoint2) in waypoint_distances.keys():
-                out_file.write("\n" +
-                               "\t".join([waypoint1,
-                                          waypoint2,
-                                          str(waypoint_distances[frozenset([waypoint1, waypoint2])]),
-                                          str(waypoint_durations[frozenset([waypoint1, waypoint2])])]))
+                for (waypoint1, waypoint2) in waypoint_distances.keys():
+                    out_file.write("\n" +
+                                   "\t".join([waypoint1,
+                                              waypoint2,
+                                              str(waypoint_distances[frozenset([waypoint1, waypoint2])]),
+                                              str(waypoint_durations[frozenset([waypoint1, waypoint2])])]))
 
-        self._waypoint_distances = {}
-        self._waypoint_durations = {}
-        all_waypoints = set()
+            waypoint_distances = {}
+            waypoint_durations = {}
+            all_waypoints = set()
 
         waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
 
@@ -61,6 +62,10 @@ class Router:
             waypoint_distances[frozenset([row.waypoint1, row.waypoint2])] = row.distance_m
             waypoint_durations[frozenset([row.waypoint1, row.waypoint2])] = row.duration_s
             all_waypoints.update([row.waypoint1, row.waypoint2])
+
+        self._waypoint_distances = waypoint_distances
+        self._waypoint_durations = waypoint_durations
+        self._all_waypoints = all_waypoints
 
     def _compute_fitness(self, solution):
         """
@@ -199,5 +204,7 @@ class Router:
 
             population = new_population
 
+        return population
+
 if __name__ == '__main__':
-    router = Router(database.SQLServer('dumpstersite').getPandasTable("markers"))
+    router = Router(database.SQLServer('dumpstersite').getPandasTable("markers"), file = True)
