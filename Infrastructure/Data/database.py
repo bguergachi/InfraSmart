@@ -59,7 +59,11 @@ class SQLServer:
     def getDayToPickup(self):
         cursor = self._mySQLconnection.cursor()
         cursor.execute("SELECT day from day WHERE id = 1")
-        self._day = cursor.fetchall()
+        try:
+            self._day = cursor.fetchall()
+            self._day = self._day[0][0]
+        except:
+            self._day = cursor.fetchall()
         return self._day
 
     def close(self):
@@ -72,6 +76,7 @@ class SQLServer:
         return self._mySQLconnection
 
     def writePandas(self,table,df,exists='replace'):
+        self.customQueryToSQL("DROP TABLE "+table)
         engine = create_engine("mysql+mysqlconnector://"+self._user+":"+self._password+"@"+self._host+"/"+self._database,echo=False)
         df.to_sql(name=table,con=engine,if_exists = exists)
 

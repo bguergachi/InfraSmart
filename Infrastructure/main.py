@@ -68,7 +68,7 @@ if __name__ == '__main__':
     markersList = scheduler['router'].run_genetic_algorithm()
 
     final = sortPandasToWriteSQL(markers,markersList)
-    final['BestDay'] = sqlServer.getDayToPickup()
+    final['DayOfTheWeek'] = sqlServer.getDayToPickup()
 
     sqlServer.writePandas("markers",final)
     sqlServer.close()
