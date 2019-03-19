@@ -1,0 +1,10 @@
+1.	Copy wordpress into the www folder of wampserver
+2.	Install all in one migrator 
+3.	Place into the hta access file, if it doesn’t exist inside the wordpress folder then need to accept the permalink. 
+
+php_value upload_max_filesize 64M
+php_value post_max_size 64M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+
