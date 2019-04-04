@@ -1,4 +1,4 @@
-Location,Time,Accessibility,Day,Priority
+distance,time,availability,day,schedule
 1234,54371.80,56.97,0,tu
 3245,11533.49,32.26,0,tu
 3245,57985.07,84.82,0,tu

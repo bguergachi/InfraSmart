@@ -5,12 +5,14 @@ import numpy as np
 import pandas as pd
 import random
 
-gmaps = googlemaps.Client(key="AIzaSyB9KEVekAHK9YNSO0rLzwlc_M6pDN-BNEM")
+gmaps = googlemaps.Client(key="AIzaSyDerKFzrHHVHWIHqqohps8R36Tce0KEibQ")
 
 class Router:
     def __init__(self, dataFrame, file = False):
 
-        self._accessibility = dataFrame['accessibility'].values.tolist()
+        skip = False
+
+        self._accessibility = dataFrame['availability'].values.tolist()
 
         self._all_waypoints = (dataFrame['lat'].map(str) + "," + dataFrame['lng'].map(str)).values.tolist()
 
@@ -38,6 +40,7 @@ class Router:
 
                 except Exception as e:
                     print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
+                    raise LookupError("Please fix Google maps API connection")
 
             with open("my-waypoints-dist-dur.tsv", "w") as out_file:
                 out_file.write("\t".join(["waypoint1",
@@ -52,9 +55,9 @@ class Router:
                                               str(waypoint_distances[frozenset([waypoint1, waypoint2])]),
                                               str(waypoint_durations[frozenset([waypoint1, waypoint2])])]))
 
-            waypoint_distances = {}
-            waypoint_durations = {}
-            all_waypoints = set()
+        waypoint_distances = {}
+        waypoint_durations = {}
+        all_waypoints = set()
 
         waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
 
@@ -207,4 +210,11 @@ class Router:
         return population
 
 if __name__ == '__main__':
-    router = Router(database.SQLServer('dumpstersite').getPandasTable("markers"), file = True)
+    sql = database.SQLServer('dumpstersite')
+    markers = sql.getMarkersFromTraining()
+    markerData = markers.reset_index(drop=True)
+    markerData.index.name = 'id'
+    markerData = markerData.iloc[:9]
+    router = Router(markerData, file = True)
+    stuff = router.run_genetic_algorithm()
+    print(stuff)

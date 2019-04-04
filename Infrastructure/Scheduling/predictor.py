@@ -38,9 +38,9 @@ class Predictor:
         #Convert index to day string
         self._days = ['m', 'tu', 'w', 'th', 'f']
 
-        self._encode_text_index(df, "Priority")
-        self._x, self._y = df.as_matrix(["Location", "Time", "Accessibility", "Day"]), np.stack(
-            df["Priority"].values, axis=0)
+        self._encode_text_index(df, "schedule")
+        self._x, self._y = df.as_matrix(["distance", "time", "availability", "day", "month"]), np.stack(
+            df["schedule"].values, axis=0)
 
         print(self._x)
         print(self._y)
@@ -75,7 +75,7 @@ class Predictor:
         #monitor = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-3, patience=5, verbose=0, mode='auto')
         #checkpointer = keras.callbacks.ModelCheckpoint(filepath=self._dataFolderPath + "optimized_weights.hdf5",
         #                                               verbose=0, save_best_only=True)  # save best model
-        self._model.fit(self._x, self._y, verbose=2, epochs=100)
+        self._history = self._model.fit(self._x, self._y, verbose=2, epochs=100)
         # Use when data is large enough
         # self._model.load_weights(self._dataFolderPath+"optimized_weights.hdf5") # load weights from best model
 
@@ -110,18 +110,25 @@ class Predictor:
         self._weeklyProbability = np.mean(self._weeklyMatrix, axis=0)
         return self._weeklyProbability
 
-    def scheduleDay(self,threshold=None):
+    def scheduleDay(self,threshold=None,reset=True):
         '''
         Get day to schedule based on highest probability or probability threshold user passes
         :return: string of day to schedule
         '''
         if threshold == None:
             list = np.argmax(self.scheduleDayVector()).tolist()
+            if reset:
+                self._weeklyMatrix = None
             try:
                 return self._days[list[0]]
             except:
                 return self._days[list]
+        if reset:
+            self._weeklyMatrix = None
         return self.scheduleDayVector()[np.where(self.scheduleDayVector() > threshold)]
+
+    def getAccuracy(self):
+        return self._history.history()
 
     # Update data and train model again
     def updateAndTrain(self, data):

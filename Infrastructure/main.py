@@ -1,6 +1,10 @@
 import database
+import dataGen
 import predictor
 import router
+import pandas as pd
+import numpy as np
+import datetime
 
 '''
 def createPredictor(dataFrame):
@@ -13,15 +17,7 @@ def createRouter(dataFrame):
 '''
 
 
-def sortPandasToWriteSQL(dataFrame, listToSortWith):
-    df = dataFrame
-    priority = 1
-    for location in list(listToSortWith[0]):
-        latlong = location.split(',')
-        df.at[
-            df.loc[(df['lat'] == float(latlong[0])) & (df['lng'] == float(latlong[1]))].index[0], 'priority'] = priority
-        priority += 1
-    return df
+
 
 
 if __name__ == '__main__':
@@ -43,14 +39,19 @@ if __name__ == '__main__':
     print("After update:")
     print(b)
     '''
-
+    '''
     # Demo 2
     # Make server connection
     sqlServer = database.SQLServer('dumpstersite')
-    markers = sqlServer.getPandasTable('markers')
+    dataGen.calcData('sensordata',sqlServer)
+
+
+    sensordata = sqlServer.getPandasTable(table='sensordata')
+    markers = sqlServer.getMarkersFromRaw('sensordata')
+
     # rawMarkers = sqlServer.getMarkersFromRaw()
-    raw = sqlServer.getPandasTable(table='raw')
-    scheduler = {'predictor': predictor.Predictor(raw), 'router': router.Router(markers,file=True)}
+
+    scheduler = {'predictor': predictor.Predictor(sensordata), 'router': router.Router(markers,file=True)}
 
     # Build prediction matrix
     scheduler['predictor'].predict([3245, 19402.08, 100, 2])
@@ -67,8 +68,50 @@ if __name__ == '__main__':
 
     markersList = scheduler['router'].run_genetic_algorithm()
 
-    final = sortPandasToWriteSQL(markers,markersList)
+    final = dataGen.sortPandasToWriteSQL(markers,markersList)
     final['DayOfTheWeek'] = sqlServer.getDayToPickup()
 
-    sqlServer.writePandas("markers",final)
+    sqlServer.writePandasMarkers("markers",final)
     sqlServer.close()
+    '''
+
+    #Demo 3
+    #Set database
+    sql = database.SQLServer('dumpstersite')
+    #Generate training data
+    dataGen.generateRandomTrainingData(52,sql,coordinate=sql.customQueryToSQL("SELECT DISTINCT Lat,Lng FROM sensordata"))
+
+    sql.createMetaTable()
+    meta = sql.getPandasTable('meta')
+    initialCoordinates = tuple(sql.getIntialLocation())
+    toPredict = dataGen.calcData(sql, startcoordinate=initialCoordinates)
+
+    training = sql.getPandasTable('trainingData')
+    trainingData = training.drop(['lat','lng','date'], axis=1)
+    trainingData = trainingData.dropna(axis='rows')
+
+    markers = sql.getMarkersFromTraining()
+    markerData = markers.reset_index(drop=True)
+    markerData.index.name = 'id'
+
+    scheduler = {'predictor': predictor.Predictor(trainingData), 'router': router.Router(markerData,file=True)}
+
+    for row in toPredict.iterrows():
+        index, data = row
+        scheduler['predictor'].predict([data['distance'], data['time'], data['availability'], data['day'], data['month']])
+
+    bestDay = scheduler['predictor'].scheduleDay()
+    sql.setDayToPickup(bestDay)
+
+    markerData['DayOfTheWeek'] = sql.getDayToPickup()
+    markerData['priority'] = 1
+    markerData['address'] = 'L'
+    sql.insertPandas('markers',markerData)
+    sql.close()
+
+    markersList = scheduler['router'].run_genetic_algorithm()
+    finalMarkers = dataGen.sortPandasToWriteSQL(markers, markersList)
+    finalMarkers = finalMarkers.append(pd.DataFrame([{'lat':initialCoordinates[0],'lng':initialCoordinates[1],'date':datetime.date.today(),'availability':0,'priority':1}]), ignore_index=True)
+
+
+
