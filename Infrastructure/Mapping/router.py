@@ -7,8 +7,9 @@ import random
 
 gmaps = googlemaps.Client(key="AIzaSyDerKFzrHHVHWIHqqohps8R36Tce0KEibQ")
 
+
 class Router:
-    def __init__(self, dataFrame, file = False):
+    def __init__(self, dataFrame, file=False):
 
         skip = False
 
@@ -70,7 +71,7 @@ class Router:
         self._waypoint_durations = waypoint_durations
         self._all_waypoints = all_waypoints
 
-    def _compute_fitness(self, solution):
+    def _compute_fitness(self, solution, bias=0.1):
         """
             This function returns the total distance traveled on the current road trip.
 
@@ -83,10 +84,10 @@ class Router:
         for index in range(len(solution)):
             waypoint1 = solution[index - 1]
             waypoint2 = solution[index]
-            solution_fitness += self._waypoint_distances[frozenset([waypoint1, waypoint2])]*(1-(self._accessibility[index]-self._accessibility[index-1])/sum(self._accessibility))
+            solution_fitness += self._waypoint_distances[frozenset([waypoint1, waypoint2])] * bias * (
+                        1 - (self._accessibility[index] - self._accessibility[index - 1]) / sum(self._accessibility))
 
         return solution_fitness
-
 
     def _generate_random_agent(self):
         """
@@ -96,7 +97,6 @@ class Router:
         new_random_agent = list(self._all_waypoints)
         random.shuffle(new_random_agent)
         return tuple(new_random_agent)
-
 
     def _mutate_agent(self, agent_genome, max_mutations=3):
         """
@@ -119,7 +119,6 @@ class Router:
 
         return tuple(agent_genome)
 
-
     def _shuffle_mutation(self, agent_genome):
         """
             Applies a single shuffle mutation to the given road trip.
@@ -141,7 +140,6 @@ class Router:
 
         return tuple(agent_genome)
 
-
     def _generate_random_population(self, pop_size):
         """
             Generates a list with `pop_size` number of random road trips.
@@ -151,7 +149,6 @@ class Router:
         for agent in range(pop_size):
             random_population.append(self._generate_random_agent())
         return random_population
-
 
     def run_genetic_algorithm(self, generations=5000, population_size=100):
         """
@@ -209,12 +206,13 @@ class Router:
 
         return population
 
+
 if __name__ == '__main__':
     sql = database.SQLServer('dumpstersite')
     markers = sql.getMarkersFromTraining()
     markerData = markers.reset_index(drop=True)
     markerData.index.name = 'id'
     markerData = markerData.iloc[:9]
-    router = Router(markerData, file = True)
+    router = Router(markerData, file=True)
     stuff = router.run_genetic_algorithm()
     print(stuff)

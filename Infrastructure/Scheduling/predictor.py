@@ -1,13 +1,14 @@
 # Tensorflow and Keras
 import tensorflow as tf
 from tensorflow import keras
+#from ann_visualizer.visualize import ann_viz
 from sklearn import preprocessing
 
 # Helper libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import os, sys
+import os, sys, math
 
 # Set verbosity of tensorflow
 
@@ -56,11 +57,9 @@ class Predictor:
 
         self._model = keras.Sequential()
 
-        self._model.add(keras.layers.Dense(inputNodes, input_dim=self._x.shape[1], activation=tf.nn.relu))
-        self._model.add(keras.layers.Dense(12, kernel_initializer='normal'))
-        self._model.add(keras.layers.Activation(tf.nn.relu))
-        self._model.add(keras.layers.Dense(24, kernel_initializer='normal'))
-        self._model.add(keras.layers.Activation(tf.nn.relu))
+        self._model.add(keras.layers.Dense(inputNodes, input_dim=self._x.shape[1], activation=tf.nn.sigmoid))
+        self._model.add(keras.layers.Dense(math.ceil(inputNodes*2/3), kernel_initializer='normal'))
+        self._model.add(keras.layers.Activation(tf.nn.sigmoid))
         self._model.add(keras.layers.Dense(self._y.shape[1], activation=tf.nn.softmax))
 
         self._model.summary()

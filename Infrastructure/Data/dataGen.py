@@ -44,12 +44,17 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
             # Loop for all possible sensor locations
             for y in range(6):
                 # Cumulative percent with added randomness
-                percentArray[y] += round(Decimal((random.normalvariate(mean, standardDeviation) / 5) * 100), 2)
+                percentArray[y] += round(Decimal((random.normalvariate(mean, standardDeviation) / 5)), 4)
                 # make random data
                 a = random.randint(0, 8)
                 stringToPrint[0] = locations[a]
                 stringToPrint[1] = round(Decimal(random.uniform(0, 86400)), 2)
-                stringToPrint[2] = percentArray[y] if percentArray[y] <= 100 else 0 if percentArray[y] < 0 else 100
+                if percentArray[y] > 1:
+                    stringToPrint[2] = 1
+                elif percentArray[y] < 0:
+                    stringToPrint[2] = 0
+                else:
+                    stringToPrint[2] = percentArray[y]
                 stringToPrint[3] = random.randint(0, 12)
                 stringToPrint[4] = x
                 stringToPrint[5] = coordinate[a][0]
@@ -62,7 +67,7 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
                 except:
                     currentMatrix = np.array(stringToPrint)
                 # check if threshold is met to label past week
-                if percentArray[y] >= 70 and pickup == -1:
+                if percentArray[y] >= 0.7 and pickup == -1:
                     # Reset precentArray
                     percentArray = [0] * len(locations)
                     pickup = x
@@ -108,7 +113,7 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
     sql.insertPandas('trainingData', df, withSchedule=True)
 
 
-def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata', databaseName='dumpstersite'):
+def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata'):
     try:
         df = sql.getPandasTable(sqlTable, "SELECT * FROM " + sqlTable + " WHERE Processed <> 1")
     except:
@@ -167,7 +172,7 @@ def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata'
     return dfW
 
 
-def sortPandasToWriteSQL(dataFrame, listToSortWith, intiallocation):
+def sortPandasToWriteSQL(dataFrame, listToSortWith):
     df = dataFrame
     priority = 2
     for location in list(listToSortWith[0]):
