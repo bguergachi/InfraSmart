@@ -5,19 +5,21 @@ import pandas as pd
 import database
 from math import sin, cos, sqrt, atan2, radians, pi
 import datetime, calendar
+import matplotlib.pyplot as plt
+from collections import Counter
 
 # Day array
 days = ['m', 'tu', 'w', 'th', 'f']
 # Possible location distances
-locations = [3245, 1234, 7564, 1233, 312, 534, 12, 24524,453]
+locations = [3245, 1234, 7564, 1233, 312, 534, 12, 24524, 453]
 
 
-def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
+def generateRandomTrainingData(amountOfData, sql, plot=False, mean=1.4, standardDeviation=0.27,
                                coordinate=[(-79.3652141, 43.64631791), (-79.38645152, 43.65184241),
                                            (-79.3708487, 43.66110569), (-79.38603076, 43.67209961),
                                            (-79.36808013, 43.67084828), (-79.39342123, 43.65591903),
                                            (-79.38909398, 43.67188004), (-79.46744499, 42.64582615),
-                                           (-79.40361049, 43.65204426)]):
+                                           (-79.40361049, 43.65204426)],inital = (43.652042, -79.403610)):
     '''
     This function is a way to generate random data based on a realistic manner. The Accessibility factor is based on
     a randomized cumulative weekly model. This function attempts to simulate real world data using log-normal distribution.
@@ -27,6 +29,8 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
     :param standardDeviation: The error/spread in the normal distribution for the percent increase distribution
     :return: none
     '''
+    # Df data for graphing distribution
+    dfp = pd.DataFrame()
     # Set percent values for each location
     percentArray = [0] * len(locations)
     # Set data point
@@ -42,25 +46,32 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
         # loop for all days of the week
         for x in range(5):
             # Loop for all possible sensor locations
-            for y in range(6):
+            for y in range(len(locations)):
                 # Cumulative percent with added randomness
-                percentArray[y] += round(Decimal((random.normalvariate(mean, standardDeviation) / 5)), 4)
+                p = np.random.lognormal(mean, standardDeviation)
+                if p < 0:
+                    p = 0
+                percentArray[y] += round(Decimal((1 / (p + 1))), 4)
                 # make random data
                 a = random.randint(0, 8)
-                stringToPrint[0] = locations[a]
+                stringToPrint[0] = getDistance(coordinate[a],inital)
                 stringToPrint[1] = round(Decimal(random.uniform(0, 86400)), 2)
                 if percentArray[y] > 1:
                     stringToPrint[2] = 1
-                elif percentArray[y] < 0:
-                    stringToPrint[2] = 0
+                    if plot:
+                        # Add data for plotting distribution
+                        dfp = dfp.append(pd.DataFrame([{'p': p, 'c': 1}]))
                 else:
                     stringToPrint[2] = percentArray[y]
+                    if plot:
+                        # Add data for plotting distribution
+                        dfp = dfp.append(pd.DataFrame([{'p': p, 'c': percentArray[y]}]))
                 stringToPrint[3] = random.randint(0, 12)
                 stringToPrint[4] = x
                 stringToPrint[5] = coordinate[a][0]
                 stringToPrint[6] = coordinate[a][1]
                 stringToPrint[7] = datetime.datetime.now()
-                print(stringToPrint[2])
+                print(str(stringToPrint[2])+"\t"+str(p))
                 # Create present data matrix
                 try:
                     currentMatrix = np.vstack((currentMatrix, stringToPrint))
@@ -74,7 +85,7 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
 
         # Setup past matrix based on present matrix and last week label
         try:
-            pastMatrix = np.hstack((pastMatrix, np.repeat(days[pickup], 5 * 6).reshape((30, 1))))
+            pastMatrix = np.hstack((pastMatrix, np.repeat(days[pickup], 5 * len(locations)).reshape((5*len(locations), 1))))
         except NameError as namerr:
             print(namerr)
             pastMatrix = currentMatrix
@@ -112,6 +123,35 @@ def generateRandomTrainingData(amountOfData, sql, mean=2, standardDeviation=1,
     )""")
     sql.insertPandas('trainingData', df, withSchedule=True)
 
+    if plot:
+        incremental = dfp['p']
+        bins = np.arange(0,6)
+        plt.hist(incremental,bins)
+        plt.xlabel("Availability Increment")
+        plt.ylabel("Frequency")
+        plt.title('Distribution of Availability increment')
+        plt.show(align="edge", ec="k")
+
+        cumulative = dfp['c']
+        bins = np.linspace(0, 1, 40)
+        frq, edges = np.histogram(cumulative, bins)
+        fig, ax = plt.subplots()
+        ax.bar(edges[:-1], frq, width=np.diff(edges), ec="k", align="edge")
+        plt.xlabel("Availability Cumulative")
+        plt.ylabel("Frequency")
+        plt.title('Distribution of Availability cumulated')
+        plt.show()
+
+        temp = np.delete(totalMatrix, (0), axis=0)
+        labels = [row[8] for row in temp]
+        letter_counts = Counter(labels)
+        dfA = pd.DataFrame.from_dict(letter_counts, orient='index')
+        dfA.plot(kind='bar')
+        plt.show()
+
+
+
+
 
 def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata'):
     try:
@@ -120,8 +160,7 @@ def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata'
         return pd.DataFrame()
 
     idToWrite = []
-    # approximate radius of earth in km
-    R = 6373.0
+
 
     dfW = pd.DataFrame(columns=['distance', 'time', 'day', 'month', 'availability', 'lat', 'lng', 'date'])
 
@@ -142,15 +181,7 @@ def calcData(sql, startcoordinate=(43.652042, -79.403610), sqlTable='sensordata'
     for index, row in df.iterrows():
         idToWrite.append(index)
 
-        lat1 = radians(startcoordinate[0])
-        lon1 = radians(startcoordinate[1])
-        lat2 = radians(row['Lat'])
-        lon2 = radians(row['Lng'])
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        distance = R * c
+        distance = getDistance(startcoordinate,(row['Lat'],row['Lng']))
 
         dt = (df.at[index, 'CollectTime'].strftime('%Y-%m-%d %H:%M:%S')).split(' ')
         year, month, day = (int(x) for x in dt[0].split('-'))
@@ -182,6 +213,20 @@ def sortPandasToWriteSQL(dataFrame, listToSortWith):
         priority += 1
     return df
 
+def getDistance(startcoordinate,coordinate):
+    # approximate radius of earth in km
+    R = 6373.0
+
+    lat1 = radians(startcoordinate[0])
+    lon1 = radians(startcoordinate[1])
+    lat2 = radians(coordinate[0])
+    lon2 = radians(coordinate[1])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
+
 
 if __name__ == '__main__':
-    generateRandomTrainingData(24)
+    generateRandomTrainingData(24, database.SQLServer('zone_1'), plot=True)

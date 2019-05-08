@@ -1,3 +1,15 @@
+'''
+All credit for the routing portion goes to the following article:
+http://www.randalolson.com/2015/03/08/computing-the-optimal-road-trip-across-the-u-s
+The code that was implemented comes from the following github page:
+https://github.com/rhiever/Data-Analysis-and-Machine-Learning-Projects/blob/master/optimal-road-trip/Computing%20the%20optimal%20road%20trip%20across%20the%20U.S..ipynb
+It is a step by step approach to run the code to find the optimum path.
+The changes made to the code is as follows:
+- Encapsulated the code into a class
+- Added code to convert dataframe data to appropriate data needed to route
+- Altered the fitness function to consider the availability of each location
+'''
+
 import googlemaps
 from itertools import combinations
 import database
@@ -9,13 +21,13 @@ gmaps = googlemaps.Client(key="AIzaSyDerKFzrHHVHWIHqqohps8R36Tce0KEibQ")
 
 
 class Router:
-    def __init__(self, dataFrame, file=False):
-
-        skip = False
+    def __init__(self, dataFrame, file=False, fileName=''):
 
         self._accessibility = dataFrame['availability'].values.tolist()
 
         self._all_waypoints = (dataFrame['lat'].map(str) + "," + dataFrame['lng'].map(str)).values.tolist()
+
+        self._dicAvailability = dict(zip(self._all_waypoints, self._accessibility))
 
         waypoint_distances = {}
         waypoint_durations = {}
@@ -43,7 +55,7 @@ class Router:
                     print("Error with finding the route between %s and %s." % (waypoint1, waypoint2))
                     raise LookupError("Please fix Google maps API connection")
 
-            with open("my-waypoints-dist-dur.tsv", "w") as out_file:
+            with open("waypoints_{}.tsv".format(fileName), "w") as out_file:
                 out_file.write("\t".join(["waypoint1",
                                           "waypoint2",
                                           "distance_m",
@@ -60,7 +72,7 @@ class Router:
         waypoint_durations = {}
         all_waypoints = set()
 
-        waypoint_data = pd.read_csv("my-waypoints-dist-dur.tsv", sep="\t")
+        waypoint_data = pd.read_csv("waypoints_{}.tsv".format(fileName), sep="\t")
 
         for i, row in waypoint_data.iterrows():
             waypoint_distances[frozenset([row.waypoint1, row.waypoint2])] = row.distance_m
@@ -71,7 +83,7 @@ class Router:
         self._waypoint_durations = waypoint_durations
         self._all_waypoints = all_waypoints
 
-    def _compute_fitness(self, solution, bias=0.1):
+    def _compute_fitness(self, solution, bias=5):
         """
             This function returns the total distance traveled on the current road trip.
 
@@ -84,8 +96,8 @@ class Router:
         for index in range(len(solution)):
             waypoint1 = solution[index - 1]
             waypoint2 = solution[index]
-            solution_fitness += self._waypoint_distances[frozenset([waypoint1, waypoint2])] * bias * (
-                        1 - (self._accessibility[index] - self._accessibility[index - 1]) / sum(self._accessibility))
+            solution_fitness += self._waypoint_distances[frozenset([waypoint1, waypoint2])] - bias * abs(
+                self._dicAvailability[waypoint2] - self._dicAvailability[waypoint1])
 
         return solution_fitness
 
@@ -208,11 +220,19 @@ class Router:
 
 
 if __name__ == '__main__':
-    sql = database.SQLServer('dumpstersite')
+    '''
+    sql = database.SQLServer('zone_1')
     markers = sql.getMarkersFromTraining()
     markerData = markers.reset_index(drop=True)
     markerData.index.name = 'id'
     markerData = markerData.iloc[:9]
     router = Router(markerData, file=True)
+    stuff = router.run_genetic_algorithm()
+    print(stuff)  
+    '''
+    df = pd.DataFrame([{'lat': 43.656493, 'lng': -79.377160, 'availability': 0}])
+    df = df.append(pd.DataFrame([{'lat': 43.655357, 'lng': -79.373935 , 'availability': 1}]))
+    df = df.append(pd.DataFrame([{'lat': 43.661357, 'lng': -79.382432, 'availability': 1000}]))
+    router = Router(df, file=False, fileName='test')
     stuff = router.run_genetic_algorithm()
     print(stuff)

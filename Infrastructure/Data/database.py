@@ -122,7 +122,8 @@ class SQLServer:
                         "INSERT INTO " + table + " (distance,time,day,month,availability,schedule,date,lat,lng) VALUES ('"
                         + str(row['distance']) + "','" + str(row['time']) + "','" + str(row['day']) + "','" + str(
                             row['month']) + "','" + str(row[
-                                                            'availability']) + "','" + str(row['schedule']) + "','" + str(row['date']) + "','" +
+                                                            'availability']) + "','" + str(
+                            row['schedule']) + "','" + str(row['date']) + "','" +
                         str(row['lat']) + "','" + str(row['lng']) + "')")
             else:
                 for index, row in df.iterrows():
@@ -134,19 +135,21 @@ class SQLServer:
                         str(row['lat']) + "','" + str(row['lng']) + "')")
         elif table == 'markers':
             self.customQueryToSQL('DELETE FROM ' + table)
+            self.customQueryToSQL('ALTER TABLE ' + table + ' AUTO_INCREMENT = 1')
             for index, row in df.iterrows():
                 self.customQueryToSQL(
                     "INSERT INTO " + table + " (priority,lat,lng,availability,date,time,DayOfTheWeek,address) VALUES ('" +
                     str(row['priority']) + "','"
                     + str(row['lat']) + "','" + str(row['lng']) + "','" + str(row['availability']) + "','" + str(row[
-                        'date']) + "','" + str(row['time']) + "','" + str(row['DayOfTheWeek']) + "','" + str(row['address']) + "')")
+                                                                                                                     'date']) + "','" + str(
+                        row['time']) + "','" + str(row['DayOfTheWeek']) + "','" + str(row['address']) + "')")
         else:
             raise TypeError("Table given not correct")
 
     def getMarkersFromTraining(self, table='trainingData'):
         return self.getPandasTable(table,
                                    query="SELECT t1.id,t1.lat,t1.lng,t1.availability,t1.date,t1.time FROM " + table + " t1 WHERE t1.id = (SELECT MAX(t2.id) FROM " + table + " t2 WHERE t2.lat = t1.lat AND t2.lng = t1.lng)",
-                                   columns=['id', 'lat', 'lng', 'availability', 'date','time'])
+                                   columns=['id', 'lat', 'lng', 'availability', 'date', 'time'])
 
 
 if __name__ == '__main__':

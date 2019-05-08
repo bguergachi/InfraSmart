@@ -8,7 +8,7 @@ from sklearn import preprocessing
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import os, sys, math
+import os, sys, math, database
 
 # Set verbosity of tensorflow
 
@@ -17,7 +17,7 @@ inputNodes = 4
 
 
 class Predictor:
-    def __init__(self, dataFrame,dataFolderPath=None):
+    def __init__(self, dataFrame,dataFolderPath=None, plot=False):
         '''
         Create a neural network predictor to schedule day of the week
         :param dataFolderPath: path to data folder with .csv file, .db file and .hdf5 file
@@ -47,7 +47,7 @@ class Predictor:
         print(self._y)
 
         self._buildModel()
-        self.train()
+        self.train(plot=plot)
 
     def _buildModel(self):
         '''
@@ -64,7 +64,7 @@ class Predictor:
 
         self._model.summary()
 
-    def train(self):
+    def train(self, plot = False):
         '''
         Train model created by object
         :return: null
@@ -74,9 +74,27 @@ class Predictor:
         #monitor = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-3, patience=5, verbose=0, mode='auto')
         #checkpointer = keras.callbacks.ModelCheckpoint(filepath=self._dataFolderPath + "optimized_weights.hdf5",
         #                                               verbose=0, save_best_only=True)  # save best model
-        self._history = self._model.fit(self._x, self._y, verbose=2, epochs=100)
+        self._history = self._model.fit(self._x, self._y, verbose=2, epochs=100,validation_split=0.33)
         # Use when data is large enough
         # self._model.load_weights(self._dataFolderPath+"optimized_weights.hdf5") # load weights from best model
+
+        if plot:
+            # summarize history for accuracy
+            plt.plot(self._history.history['acc'])
+            plt.plot(self._history.history['val_acc'])
+            plt.title('model accuracy')
+            plt.ylabel('accuracy')
+            plt.xlabel('epoch')
+            plt.legend(['train', 'test'], loc='upper left')
+            plt.show()
+            # summarize history for loss
+            plt.plot(self._history.history['loss'])
+            plt.plot(self._history.history['val_loss'])
+            plt.title('model loss')
+            plt.ylabel('loss')
+            plt.xlabel('epoch')
+            plt.legend(['train', 'test'], loc='upper left')
+            plt.show()
 
     def predict(self, input):
         '''
@@ -196,6 +214,11 @@ class Predictor:
 
 if __name__ == "__main__":
     # Testing if working
-    main = Predictor("Data/")
+    sql = database.SQLServer('zone_1')
+
+    training = sql.getPandasTable('trainingData')
+    trainingData = training.drop(['lat', 'lng', 'date'], axis=1)
+    trainingData = trainingData.dropna(axis='rows')
+    main = Predictor(trainingData,plot=True)
     print(main.predict([234, 2345, 347, 45, 2]))
     print(main.predict([230, 2300, 300, 40, 2]))
